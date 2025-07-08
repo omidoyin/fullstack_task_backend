@@ -3,6 +3,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 require("dotenv").config()
+const errorHandler = require('./middleware/errorHandler.middleware');
 
 const user = require("./routes/user.routes")
 const auth = require("./routes/auth.routes")
@@ -20,6 +21,12 @@ app.use(express.json())
 app.get("/", user)
 app.use("/api", auth)
 app.use("/api/task", task)
+
+
+
+
+// After all routes
+app.use(errorHandler);
 
 
 // start server

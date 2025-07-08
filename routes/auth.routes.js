@@ -3,11 +3,12 @@ const router = express.Router();
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
 
 router.post("/register", async (req, res) => {
   try {
     // const {title, description,completed} = req.body
-    const { name, email, password } = req.body;
+    const { name, email, password,role } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -17,9 +18,15 @@ router.post("/register", async (req, res) => {
       name,
       email,
       password: hashed_pw,
+      role
     });
 
     await newUser.save();
+
+    const html = `<h1>Welcome, ${name}!</h1><p>Your account is ready.</p>`;
+
+    // await sendEmail(email, "Welcome to TaskApp!", html);
+
     return res.status(200).json({ message: "user registered successfully" });
   } catch (error) {
     console.log({ error });
@@ -48,7 +55,7 @@ router.post("/login", async (req, res) => {
 
     // sign jwt
     const token = await jwt.sign(
-      { user_id: foundUser.id, email: foundUser.email },
+      { user_id: foundUser.id, email: foundUser.email, role: foundUser.role},
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
